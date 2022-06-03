@@ -1,57 +1,33 @@
 const net = require("net");
 const RESP = require("./resp");
+const Core = require("./core");
 
 const server = net.createServer(socket => {
-    const map = new Map();
-    const expMap = new Map();
+    const core = new Core();
+    console.log(core);
+    const cb = (message) => {
+        const [cmd, ...args] = message;
 
-    const cb = (result) => {
-        const [cmd, ...args] = result;
+        const commandMapping = {
+            'PING': core.ping,
+            'ECHO': core.echo,
+            'GET': core.get,
+            'SET': core.set,
+        };
         
-        console.log({cmd, args});
+        const commandHandler = commandMapping[cmd.toUpperCase()].bind(core);
 
-        switch(cmd.toUpperCase()) {
-            case 'PING': {
-                socket.write(RESP.encode('PONG'));
-                break;
-            }
-            case 'ECHO': {
-                socket.write(RESP.encode(args[0]));
-                break;
-            }
-            case 'SET': {
-                const [key, value, exp, ms] = args;
-                map.set(key, value);
-
-                if(exp?.toUpperCase() === 'PX') {
-                    expMap.set(key, Date.now() + ms)
-                }
-
-                socket.write(RESP.encode('OK'));
-                break;
-            }
-            case 'GET': {
-                const [key] = args;
-
-                if(Date.now() > expMap.get(key)) {
-                    expMap.delete(key);
-                    map.delete(key);
-                }
-                const val = map.get(key) || null;
-
-                socket.write(RESP.encode(val));
-                break;
-            }
-        }
+        const result = commandHandler(args);
+        socket.write(RESP.encode(result));
     };
 
     const resp = new RESP(cb);
 
     socket.on('data', stream => {
         const message = stream.toString('utf-8');
-        console.log({message});
+        console.log({ message });
         resp.next(message);
-        
+
     })
 });
 

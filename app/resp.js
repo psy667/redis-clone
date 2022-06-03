@@ -1,4 +1,4 @@
-const CRLF = '\r\n';
+const CRLF = '\n';
 
 class RESP {
     constructor(cb) {

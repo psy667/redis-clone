@@ -1,8 +1,6 @@
 const net = require("net");
 const RESP = require("./resp");
 
-console.log("Logs from your program will appear here!");
-
 const server = net.createServer(socket => {
 
     const cb = (result) => {
@@ -10,11 +8,11 @@ const server = net.createServer(socket => {
         
         console.log({cmd, args});
 
-        if(cmd === 'PING') {
+        if(cmd.toUpperCase() === 'PING') {
             socket.write(RESP.encode('PONG'))
         }
 
-        if(cmd === 'ECHO') {
+        if(cmd.toUpperCase() === 'ECHO') {
             socket.write(RESP.encode(args[0]))
         }
 

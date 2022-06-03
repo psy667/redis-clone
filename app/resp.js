@@ -114,6 +114,9 @@ class RESP {
                 this.stop();
             }
         }
+        if(input.length > i + CRLF.length) {
+            this.next(input.slice(i + CRLF.length))
+        }
     }
 
     stop() {

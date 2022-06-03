@@ -11,10 +11,10 @@ class RESP {
 
 const server = net.createServer(socket => {
     socket.on('data', stream => {
-        const request = stream.toString('ascii').trim();
-        console.log({request});
+        const request = stream.toString('utf-8');
+
         switch(request) {
-            case 'PING':
+            case '+PING\r\n':
                 socket.write(Buffer.from(RESP.fromStr('PONG')));
                 break;
             default:

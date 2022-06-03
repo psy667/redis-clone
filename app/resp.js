@@ -135,6 +135,9 @@ class RESP {
         if(typeof value === 'object' && Array.isArray(value)) {
             return '*' + value.length + CRLF + value.map(this.encode).join('')
         }
+        if(value === null) {
+            return '$-1\r\n'
+        }
     }
 }
 

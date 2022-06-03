@@ -37,8 +37,9 @@ const server = net.createServer(socket => {
                     expMap.delete(key);
                     map.delete(key);
                 }
+                const val = map.get(key) || null;
 
-                socket.write(RESP.encode(map.get(key)));
+                socket.write(RESP.encode(val));
                 break;
             }
         }

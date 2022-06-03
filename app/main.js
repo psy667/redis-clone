@@ -1,26 +1,45 @@
 const net = require("net");
+const RESP = require("./resp");
 
-// You can use print statements as follows for debugging, they'll be visible when running tests.
 console.log("Logs from your program will appear here!");
 
-class RESP {
-    static fromStr(str) {
-        return `+${str.trim()}\r\n`
-    }
-}
-
 const server = net.createServer(socket => {
-    socket.on('data', stream => {
-        const request = stream.toString('utf-8');
 
-        switch(request) {
-            case '+PING\r\n':
-                socket.write(Buffer.from(RESP.fromStr('PONG')));
-                break;
-            default:
-                socket.write(Buffer.from(RESP.fromStr('PONG')));
+    const cb = (result) => {
+        const [cmd, ...args] = result;
+        
+        console.log({cmd, args});
+
+        if(cmd === 'PING') {
+            socket.write(RESP.encode('PONG'))
         }
+
+        if(cmd === 'ECHO') {
+            socket.write(RESP.encode(args[0]))
+        }
+
+    };
+
+    const resp = new RESP(cb);
+
+    socket.on('data', stream => {
+        const message = stream.toString('utf-8');
+        console.log({message});
+        resp.next(message);
+        
     })
 });
 
 server.listen(6379, '127.0.0.1');
+
+
+/*
+*2
+$4
+LLEN
+$6\r\n
+mylist\r\n
+*/
+
+
+

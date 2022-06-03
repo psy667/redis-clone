@@ -23,7 +23,7 @@ const server = net.createServer(socket => {
                 const [key, value, exp, ms] = args;
                 map.set(key, value);
 
-                if(exp.toUpperCase() === 'PX') {
+                if(exp?.toUpperCase() === 'PX') {
                     expMap.set(key, Date.now() + ms)
                 }
 

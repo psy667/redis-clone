@@ -3,7 +3,7 @@ const RESP = require("./resp");
 
 const server = net.createServer(socket => {
     const map = new Map();
-
+    const expMap = new Map();
 
     const cb = (result) => {
         const [cmd, ...args] = result;
@@ -20,13 +20,24 @@ const server = net.createServer(socket => {
                 break;
             }
             case 'SET': {
-                const [key, value] = args;
+                const [key, value, exp, ms] = args;
                 map.set(key, value);
+
+                if(exp.toUpperCase() === 'PX') {
+                    expMap.set(key, Date.now() + ms)
+                }
+
                 socket.write(RESP.encode('OK'));
                 break;
             }
             case 'GET': {
                 const [key] = args;
+
+                if(Date.now() > expMap.get(key)) {
+                    expMap.delete(key);
+                    map.delete(key);
+                }
+
                 socket.write(RESP.encode(map.get(key)));
                 break;
             }

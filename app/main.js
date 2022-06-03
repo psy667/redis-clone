@@ -18,7 +18,7 @@ const server = net.createServer(socket => {
                 socket.write(Buffer.from(RESP.fromStr('PONG')));
                 break;
             default:
-                socket.write(Buffer.from('Unknown command'));
+                socket.write(Buffer.from(RESP.fromStr('PONG')));
         }
     })
 });

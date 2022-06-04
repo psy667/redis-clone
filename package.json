@@ -1,0 +1,36 @@
+{
+  "name": "redis-clone",
+  "version": "1.0.0",
+  "description": "Simple redis clone.",
+  "main": "index.js",
+  "scripts": {
+    "compile": "tsc src/main.ts --outDir build",
+    "dev": "ts-node-dev --respawn ./src/main.ts",
+    "prod": "npm run compile && node ./build/main.js",
+    "integration": "node ./test/integration.js",
+    "unit": "node ./test/unit.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/psy667/redis-clone.git"
+  },
+  "keywords": [
+    "redis"
+  ],
+  "author": "psy667",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/psy667/redis-clone/issues"
+  },
+  "homepage": "https://github.com/psy667/redis-clone#readme",
+  "devDependencies": {
+    "@tsconfig/recommended": "^1.0.1",
+    "@types/node": "^17.0.39",
+    "@typescript-eslint/eslint-plugin": "^5.27.0",
+    "@typescript-eslint/parser": "^5.27.0",
+    "eslint": "^8.17.0",
+    "redis": "^4.1.0",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^4.7.3"
+  }
+}

@@ -1,20 +1,18 @@
-module.exports = class Core {
-    constructor() {
-        this.map = new Map();
-        this.expMap = new Map();
-    }
+export class Core {
+    private map = new Map();
+    private expMap = new Map();
+    
+    constructor() {}
 
-    ping() {
+    public ping() {
         return 'PONG'
     }
 
-    echo(args) {
-        return args[0]
+    public echo(value: string) {
+        return value;
     }
 
-    set(args) {
-        const [key, value, exp, ms] = args;
-
+    public set(key: string, value: string, exp: string, ms: string) {
         this.map.set(key, value);
 
         if (exp?.toUpperCase() === 'PX') {
@@ -24,14 +22,13 @@ module.exports = class Core {
         return 'OK';
     }
 
-    get(args) {
-        const [key] = args;
-
+    public get(key: string) {
         if (this.expMap.has(key) && Date.now() > this.expMap.get(key)) {
             this.expMap.delete(key);
             this.map.delete(key);
+            return null;
         }
 
         return this.map.get(key) || null;
-    }
+    } 
 }

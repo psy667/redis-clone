@@ -1,5 +1,5 @@
 const assert = require("assert");
-const RESP = require("../app/resp");
+const {RESP} = require("../build/resp");
 const { it, describe } = require("./test-framework");
 
 describe('RESP', () => {

@@ -68,7 +68,6 @@ const testRunner = async () => {
         for await (const { title, fn } of suits) {
             try {
                 startLoader(title);
-                await sleep(500);
     
                 await fn();
                 stopLoader();

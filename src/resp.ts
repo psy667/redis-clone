@@ -1,6 +1,6 @@
 const CRLF = '\r\n';
 
-type Value = string | number | null | Error
+export type Value = string | number | null | Error
 
 export class RESP {
     private result: Value[]
@@ -9,15 +9,11 @@ export class RESP {
     private isBulkStr: Boolean
     private bulkStrLength: number;
     private currBulkStr: string;
-    
+
     constructor(
         private cb: (value: Value[]) => void
     ) {
-        this.init();
-    }
-
-    init() {
-        this.result = undefined;
+        this.result = [];
         this.arrLength = 0;
         this.isArray = false;
         this.isBulkStr = false;
@@ -25,7 +21,7 @@ export class RESP {
         this.currBulkStr = '';
     }
 
-    private decodeString(input, i): [string, number] {
+    private decodeString(input: string, i: number): [string, number] {
         let r = ''
 
         i++;
@@ -36,7 +32,7 @@ export class RESP {
         return [r, i]
     }
 
-    private decodeError(input, i): [Error, number] {
+    private decodeError(input: string, i: number): [Error, number] {
         let message = '';
         i++;
         while (!input.slice(i).startsWith(CRLF)) {
@@ -46,7 +42,7 @@ export class RESP {
         return [new Error(message), i]
     }
 
-    private decodeNumber(input, i): [number, number] {
+    private decodeNumber(input: string, i: number): [number, number] {
         let n = '';
         i++;
         while (!input.slice(i).startsWith(CRLF)) {
@@ -56,17 +52,17 @@ export class RESP {
         return [parseInt(n), i]
     }
 
-    next(input) {
+    next(input: string) {
         let i = 0;
-        let r: Value;
+        let r: Value | null = null;
 
-        if(this.isBulkStr) {
+        if (this.isBulkStr) {
             while (this.bulkStrLength && !input.slice(i).startsWith(CRLF)) {
                 this.currBulkStr += input[i]
                 i++;
                 this.bulkStrLength--;
             }
-            if(this.bulkStrLength) {
+            if (this.bulkStrLength) {
                 return;
             } else {
                 r = this.currBulkStr;
@@ -121,7 +117,7 @@ export class RESP {
 
         }
 
-        if (r != undefined) {
+        if (r != null) {
             if (this.isArray) {
                 if (this.arrLength > 1) {
                     this.result.push(r);
@@ -136,28 +132,32 @@ export class RESP {
                 this.stop();
             }
         }
-        if(input.length > i + CRLF.length) {
+        if (input.length > i + CRLF.length) {
             this.next(input.slice(i + CRLF.length))
         }
     }
 
     stop() {
         this.cb(this.result);
-        this.init();
+        this.result = [];
+        this.arrLength = 0;
+        this.isArray = false;
+        this.isBulkStr = false;
+        this.bulkStrLength = 0;
+        this.currBulkStr = '';
     }
 
-    static encode(value) {
-        if(typeof value === 'string') {
+    static encode(value: Value): string {
+        if (typeof value === 'string') {
             return '$' + value.length + CRLF + value + CRLF;
         }
-        if(typeof value === 'number') {
+        if (typeof value === 'number') {
             return ':' + value + CRLF;
         }
-        if(typeof value === 'object' && Array.isArray(value)) {
+        if (typeof value === 'object' && Array.isArray(value)) {
             return '*' + value.length + CRLF + value.map(this.encode).join('')
         }
-        if(value === null) {
-            return '$-1\r\n'
-        }
+
+        return '$-1\r\n'
     }
 }

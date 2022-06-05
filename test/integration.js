@@ -1,9 +1,6 @@
 const assert = require('assert');
-const { createClient } = require('redis');
+const { createClient } = require('@redis/client');
 const { beforeAll, afterAll, it, describe } = require('./test-framework');
-
-require('./core.test')
-require('./resp.test')
 
 describe('Redis', () => {
     let client;
